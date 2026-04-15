@@ -11,6 +11,7 @@ services:
       - kafka-network
     ports:
       - "55009:9092"
+      - "55010:29092"
     volumes:
       - /www/docker/kafka/data:/var/lib/kafka/data
       - /www/docker/kafka/conf/kafka_server_jaas.conf:/etc/kafka/kafka_server_jaas.conf # 配置用户名密码
