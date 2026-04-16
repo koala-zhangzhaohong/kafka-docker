@@ -6,12 +6,12 @@ networks:
 services:
   kafka:
     image: apache/kafka:latest
+    restart: always
     container_name: kafka-server
     networks:
       - kafka-network
     ports:
       - "55009:9092"
-      - "55010:29092"
     volumes:
       - /www/docker/kafka/data:/var/lib/kafka/data
       - /www/docker/kafka/conf/kafka_server_jaas.conf:/etc/kafka/kafka_server_jaas.conf # 配置用户名密码
@@ -38,6 +38,7 @@ services:
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
+    restart: always
     container_name: kafka-admin-server
     depends_on:
       - kafka
