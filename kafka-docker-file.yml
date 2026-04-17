@@ -9,7 +9,14 @@ services:
     restart: always
     volumes:
       - /www/docker/kafka/zookeeper/data:/opt/zookeeper-3.4.13/data
-      - /etc/localtime:/etc/localtime
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      TZ: "Asia/Shanghai"
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 64000
+        hard: 64000
     deploy:
       resources:
         limits:
@@ -32,9 +39,11 @@ services:
       KAFKA_JMX_PORT: 55010
       KAFKA_JMX_HOSTNAME: 192.168.1.1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
+      TZ: "Asia/Shanghai"
     volumes:
       - /www/docker/kafka/logs:/opt/kafka/logs
-      - /etc/localtime:/etc/localtime
+      - /www/docker/kafka/data:/kafka
+      - /etc/localtime:/etc/localtime:ro
     deploy:
       resources:
         limits:
@@ -53,10 +62,31 @@ services:
       ZK_HOSTS: zookeeper:2181
       # APPLICATION_SECRET: superadmin
       KM_ARGS: -Djava.net.preferIPv4Stack=true
+      TZ: "Asia/Shanghai"
     volumes:
-      - /etc/localtime:/etc/localtime
+      - /etc/localtime:/etc/localtime:ro
     deploy:
       resources:
         limits:
           memory: 14G
           cpus: "8.00"
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    restart: always
+    container_name: kafka-ui-server
+    depends_on:
+      - kafka
+    ports:
+      # 映射到8090，因为8080一般还得挂其他的服务做测试
+      - "55013:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: kafka-cluster-192.168.1.1
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+      # 配置 UI 使用用户名和密码连接 Kafka
+      # KAFKA_CLUSTERS_0_PROPERTIES_SECURITY_PROTOCOL: SASL_PLAINTEXT
+      # KAFKA_CLUSTERS_0_PROPERTIES_SASL_MECHANISM: PLAIN
+      # KAFKA_CLUSTERS_0_PROPERTIES_SASL_JAAS_CONFIG: 'org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="superadmin";'
+      TZ: "Asia/Shanghai"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro

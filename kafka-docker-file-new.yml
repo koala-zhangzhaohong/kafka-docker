@@ -15,6 +15,8 @@ services:
     volumes:
       - /www/docker/kafka/data:/var/lib/kafka/data
       - /www/docker/kafka/conf/kafka_server_jaas.conf:/etc/kafka/kafka_server_jaas.conf # 配置用户名密码
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: 'broker,controller'
@@ -32,9 +34,9 @@ services:
       KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: 'PLAIN'
       # 告诉 Kafka 读取我们的 JAAS 文件
       KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/kafka_server_jaas.conf"
-
       # 数据持久化
       KAFKA_LOG_DIRS: '/var/lib/kafka/data'
+      TZ: "Asia/Shanghai"
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
@@ -54,3 +56,7 @@ services:
       KAFKA_CLUSTERS_0_PROPERTIES_SECURITY_PROTOCOL: SASL_PLAINTEXT
       KAFKA_CLUSTERS_0_PROPERTIES_SASL_MECHANISM: PLAIN
       KAFKA_CLUSTERS_0_PROPERTIES_SASL_JAAS_CONFIG: 'org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="superadmin";'
+      TZ: "Asia/Shanghai"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
